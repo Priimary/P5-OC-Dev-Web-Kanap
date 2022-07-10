@@ -41,7 +41,10 @@ document
         let arrayCartLS = JSON.parse(localStorage.getItem('arrayCart')); // récupération tableau des produits du panier localstorage
         if(!productQty || !productClr) { // message d'érreur si les champs ne sont pas remplis
             alert("Veuillez choisir la couleur ainsi que la quantité du produit demandé.");
-        }           
+        }
+        else if(productQty < 1 || productQty > 100) {
+            alert("Veuillez sélectionner entre 1 et 100 articles.");
+        }
         else if(arrayCartLS){ // vérification si contenu dans le localstorage
             // si couleur + id existant dans un élément de l'array, alors incrémente la quantité et le renvoie dans le localstorage
             if(arrayCartLS.find(productLS => productLS.id === productId && productLS.color === productClr)){
@@ -49,16 +52,14 @@ document
                 localStorage.setItem('arrayCart', JSON.stringify(arrayCartLS));
                 alert('Vous avez bien ajouté ces produits à votre panier');
             }
-            else{ // si aucun produit trouvé, création d'un array, puis y le localstorage actuel + objet avec id, couleur, et quantité, et envoie en localstorage
-                let arrayCart = [];
+            else{ //ajout de l'objet créé avec id, color et quantity dans la variable du localstorage récupéré, et envoie en localstorage
                 let newProductJson = {
                     id : productId,
                     color : productClr,
                     quantity : productQty
                 }
-                arrayCart.push(arrayCartLS);
-                arrayCart.push(newProductJson);
-                let newArrayCart = JSON.stringify(arrayCart);
+                arrayCartLS.push(newProductJson);
+                let newArrayCart = JSON.stringify(arrayCartLS);
                 localStorage.setItem('arrayCart', newArrayCart);
                 alert("Ce produit a bien été ajouté à votre panier !");
             }
