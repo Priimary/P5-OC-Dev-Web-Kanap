@@ -55,36 +55,41 @@ function getCart() {
 function calcTotalNumberProducts() {
     // récupère les données du localstorage
     let arrayCartLS = JSON.parse(localStorage.getItem('arrayCart'));
+    // si le localstorage est vide, alors affiche 0€ de quantité total
+    if(arrayCartLS === null){
+        document.getElementById('totalQuantity').textContent = '0';
+    }
+    else{
     // calcul la quantité totale de produits dans le tableau du localstorage puis l'affiche
     let totalQuantity = arrayCartLS.reduce(function(accumulator, object) {return accumulator + object.quantity;}, 0);
     document.getElementById('totalQuantity').textContent = `${totalQuantity}`;
+    }
 }
 
 // fonction pour afficher le prix total du panier
 function calcTotalPrice() {
-    let totalPrice = 0;
     // récupération des données du localstorage
     let arrayCartLS = JSON.parse(localStorage.getItem('arrayCart'));
     // si le localstorage est vide, alors affiche 0€ de prix total
-    if(arrayCartLS.length < 1){
+    if(arrayCartLS === null){
         document.getElementById('totalPrice').textContent = '0';
     }
     else{
-    // sinon parcours chaque ligne du tableau du localstorage et récupère les données de l'api du produit  correspondant
-    arrayCartLS.forEach((a) => {
-        fetch(`http://localhost:3000/api/products/${a.id}`)
-        .then(function(res) {
-            return res.json();
+        let arrayPromises = [];
+        arrayCartLS.forEach((productCart) => {
+            // met en variable pour chaque produit une promesse où l'on demande ses info à l'api grâce à son id
+            let p = new Promise ((resolve) => {
+                fetch(`http://localhost:3000/api/products/${productCart.id}`)
+                .then((response) => response.json())
+                // on renvoie le prix en multipliant la quantité par le prix
+                .then((res) => {resolve(res.price * productCart.quantity)})
+                .catch((err) => {console.log(err)})})
+            // puis on ajoute la chaque promesse dans un tableau
+            arrayPromises.push(p);
         })
-        .then(function(prod) {
-            // puis met à jour la variable du prix total avec la quantité du produit * son prix et l'affiche 
-            totalPrice += a.quantity * prod.price;
-            document.getElementById('totalPrice').textContent = `${totalPrice}`;
-        })
-        .catch(function(err) {
-            console.log(err);
-        })
-    });
+        // on résolue toutes les promesses ensemble, puis on fait une somme du contenu du tableau reçu que l'on affiche
+        Promise.all(arrayPromises)
+        .then((res)=> {let totalPrice = res.reduce((accumulator, object)=>{return accumulator + object},0);document.getElementById('totalPrice').textContent = `${totalPrice}`});
     }
 }
 
