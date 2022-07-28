@@ -82,14 +82,22 @@ function calcTotalPrice() {
                 fetch(`http://localhost:3000/api/products/${productCart.id}`)
                 .then((response) => response.json())
                 // on renvoie le prix en multipliant la quantité par le prix
-                .then((res) => {resolve(res.price * productCart.quantity)})
-                .catch((err) => {console.log(err)})})
+                .then((res) => {
+                    resolve(res.price * productCart.quantity)
+                })
+                .catch((err) => {
+                    console.log(err)
+                })
+            })
             // puis on ajoute la chaque promesse dans un tableau
             arrayPromises.push(p);
         })
         // on résolue toutes les promesses ensemble, puis on fait une somme du contenu du tableau reçu que l'on affiche
         Promise.all(arrayPromises)
-        .then((res)=> {let totalPrice = res.reduce((accumulator, object)=>{return accumulator + object},0);document.getElementById('totalPrice').textContent = `${totalPrice}`});
+        .then((res)=> {
+            let totalPrice = res.reduce((accumulator, object)=>(accumulator + object), 0);
+            document.getElementById('totalPrice').textContent = `${totalPrice}`;
+        });
     }
 }
 
@@ -267,7 +275,7 @@ document.getElementById('order').addEventListener('click', function(e) {
                 // on change l'url pour nous renvoyer sur la page de confirmation avec le numéro de commande 
                 window.location.href = "./confirmation.html?orderId=" + res.orderId;
                 // on supprime le panier du localstorage vu que la commande est passée
-                localStorage.clear(arrayCart);
+                localStorage.clear();
             })
             .catch((err) => {
                 console.log(err);
