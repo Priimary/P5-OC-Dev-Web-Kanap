@@ -1,4 +1,4 @@
-# Kanap #
+# OC_DevWeb_P5 #
 
 This is the front end and back end server for Project 5 of the OpenClassrooms Web Developer path.
 
